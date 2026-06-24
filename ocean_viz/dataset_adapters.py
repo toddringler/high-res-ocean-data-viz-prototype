@@ -27,6 +27,22 @@ class DatasetAdapter:
         """Normalize dimension and coordinate names."""
         return ds
 
+    def normalize_longitude_convention(self, ds: xr.Dataset) -> xr.Dataset:
+        """Normalize 1D longitude coordinates to a sorted 0-360 convention."""
+        if "lon" not in ds.coords:
+            return ds
+
+        lon = ds.coords["lon"]
+        if lon.ndim != 1:
+            return ds
+
+        lon_values = lon.values
+        if lon_values.min() < 0:
+            ds = ds.assign_coords(lon=(lon % 360))
+            ds = ds.sortby("lon")
+
+        return ds
+
 
 class GLORYS12Adapter(DatasetAdapter):
     """Adapter for GLORYS12V1 data."""
@@ -43,6 +59,7 @@ class GLORYS12Adapter(DatasetAdapter):
 
         # Normalize coordinates
         ds = self.normalize_coordinates(ds)
+        ds = self.normalize_longitude_convention(ds)
 
         # Subset by time
         time_start, time_end = time_range
@@ -119,6 +136,7 @@ class LocalNetCDFAdapter(DatasetAdapter):
 
         ds = xr.open_mfdataset(file_pattern, engine=engine, combine="by_coords")
         ds = self.normalize_coordinates(ds)
+        ds = self.normalize_longitude_convention(ds)
 
         # Subset by time
         time_start, time_end = time_range
@@ -162,6 +180,7 @@ class ZarrAdapter(DatasetAdapter):
 
         ds = xr.open_zarr(store_path)
         ds = self.normalize_coordinates(ds)
+        ds = self.normalize_longitude_convention(ds)
 
         # Subset by time
         time_start, time_end = time_range
