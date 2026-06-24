@@ -3,11 +3,31 @@
 import xarray as xr
 import numpy as np
 from typing import Dict, Any, Tuple, Optional
-from datetime import datetime
+from datetime import date, datetime, time
 
 from ocean_viz.config import Config
 from ocean_viz.dataset_adapters import get_adapter
 from ocean_viz.variables import get_variable_metadata, is_3d_variable
+
+
+def _parse_time_value(value: Any, field_name: str) -> datetime:
+    """Parse config time values from YAML into timezone-naive datetime.
+
+    YAML may deserialize ISO-like values into ``date`` objects, not strings.
+    This helper accepts str/date/datetime and normalizes to ``datetime``.
+    """
+    if isinstance(value, datetime):
+        return value
+
+    if isinstance(value, date):
+        return datetime.combine(value, time.min)
+
+    if isinstance(value, str):
+        return datetime.fromisoformat(value)
+
+    raise TypeError(
+        f"Invalid type for time.{field_name}: expected str/date/datetime, got {type(value).__name__}"
+    )
 
 
 def normalize_longitude(ds: xr.Dataset) -> xr.Dataset:
@@ -15,9 +35,18 @@ def normalize_longitude(ds: xr.Dataset) -> xr.Dataset:
     if "lon" not in ds.coords:
         return ds
 
-    lon = ds.coords["lon"].values
-    # Convert -180 to 180 to 0-360
-    lon = np.where(lon < 0, lon + 360, lon)
+    lon = ds.coords["lon"].values.astype(float)
+
+    # For monotonic [-180, 180] grids, shift by +180 to produce [0, 360].
+    # For unsorted or mixed inputs, fallback to wrapping only negative values.
+    lon_min = np.nanmin(lon)
+    lon_max = np.nanmax(lon)
+    is_monotonic = np.all(np.diff(lon) >= 0)
+
+    if lon_min < 0 and lon_max <= 180 and is_monotonic:
+        lon = lon + 180
+    else:
+        lon = np.where(lon < 0, lon + 360, lon)
 
     # Sort by longitude
     sort_idx = np.argsort(lon)
@@ -96,8 +125,8 @@ def load_ocean_data(config_path: str) -> xr.Dataset:
     adapter = get_adapter(config.dataset)
 
     # Parse time range
-    time_start = datetime.fromisoformat(config.time["start"])
-    time_end = datetime.fromisoformat(config.time["end"])
+    time_start = _parse_time_value(config.time["start"], "start")
+    time_end = _parse_time_value(config.time["end"], "end")
 
     # Get region bounds (assumes 0-360 convention already)
     region = config.region
@@ -143,8 +172,8 @@ def load_ocean_data_raw(config_path: str) -> xr.Dataset:
 
     adapter = get_adapter(config.dataset)
 
-    time_start = datetime.fromisoformat(config.time["start"])
-    time_end = datetime.fromisoformat(config.time["end"])
+    time_start = _parse_time_value(config.time["start"], "start")
+    time_end = _parse_time_value(config.time["end"], "end")
 
     region = config.region
     lon_min = region["lon_min"]

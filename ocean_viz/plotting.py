@@ -7,10 +7,26 @@ import cartopy.feature as cfeature
 import xarray as xr
 from pathlib import Path
 from typing import Dict, Any, Optional, Tuple
-from datetime import datetime
+from datetime import date as date_type, datetime, time
 
 from ocean_viz.config import Config
 from ocean_viz.variables import get_variable_metadata
+
+
+def _parse_render_date(value: object) -> datetime:
+    """Parse render date from config or argument into datetime."""
+    if isinstance(value, datetime):
+        return value
+
+    if isinstance(value, date_type):
+        return datetime.combine(value, time.min)
+
+    if isinstance(value, str):
+        return datetime.fromisoformat(value)
+
+    raise TypeError(
+        f"Invalid date value type: expected str/date/datetime, got {type(value).__name__}"
+    )
 
 
 def get_projection(projection_name: str) -> ccrs.Projection:
@@ -54,7 +70,7 @@ def render_snapshot(config_path: str, date: Optional[str] = None) -> str:
             date = config.time["start"]
 
     # Parse date and select
-    date_obj = datetime.fromisoformat(date)
+    date_obj = _parse_render_date(date)
     data = ds.sel(time=date_obj, method="nearest")
 
     var_name = config.variable["name"]

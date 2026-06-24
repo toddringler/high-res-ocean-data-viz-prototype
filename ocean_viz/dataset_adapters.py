@@ -67,12 +67,25 @@ class GLORYS12Adapter(DatasetAdapter):
 
     def normalize_coordinates(self, ds: xr.Dataset) -> xr.Dataset:
         """Normalize GLORYS12V1 coordinate names."""
-        # Common GLORYS dimension names
-        dim_mappings = {"x": "lon", "y": "lat", "depth": "depth", "time": "time"}
+        # Common GLORYS coordinate/dimension names across different exports
+        name_mappings = {
+            "x": "lon",
+            "y": "lat",
+            "longitude": "lon",
+            "latitude": "lat",
+            "nav_lon": "lon",
+            "nav_lat": "lat",
+        }
 
-        for old_name, new_name in dim_mappings.items():
-            if old_name in ds.dims and new_name not in ds.dims:
-                ds = ds.rename({old_name: new_name})
+        rename_map = {}
+        for old_name, new_name in name_mappings.items():
+            old_exists = old_name in ds.dims or old_name in ds.coords
+            new_exists = new_name in ds.dims or new_name in ds.coords
+            if old_exists and not new_exists:
+                rename_map[old_name] = new_name
+
+        if rename_map:
+            ds = ds.rename(rename_map)
 
         # Ensure coordinates are present
         for coord_name in ["lon", "lat", "time"]:
