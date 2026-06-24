@@ -1,0 +1,12 @@
+xarray
+dask
+numpy
+pandas
+matplotlib
+cartopy
+netCDF4
+zarr
+pyyaml
+imageio
+imageio-ffmpeg
+pytest

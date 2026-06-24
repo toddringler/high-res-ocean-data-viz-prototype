@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ocean-viz"
+version = "0.1.0"
+description = "Notebook-friendly GLORYS12V1 visualization prototype"
+readme = "../README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "xarray",
+  "dask",
+  "numpy",
+  "pandas",
+  "matplotlib",
+  "cartopy",
+  "netCDF4",
+  "zarr",
+  "pyyaml",
+  "imageio",
+  "imageio-ffmpeg"
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ocean_viz*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
