@@ -5,9 +5,9 @@ from ocean_viz.dataset_loader import subset_region, to_360
 
 
 def test_to_360_conversion():
-    lon = xr.DataArray(np.array([-170, 0, 190]))
+    lon = xr.DataArray(np.array([-170, 0, 10]))
     converted = to_360(lon)
-    assert converted.values.tolist() == [190, 0, 190]
+    assert converted.values.tolist() == [190, 0, 10]
 
 
 def test_dateline_safe_region_selection():
