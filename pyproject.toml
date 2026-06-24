@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ocean-viz"
+version = "0.1.0"
+description = "High-resolution ocean reanalysis visualization for GLORYS12V1"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    {name = "Ocean Viz Team", email = "ocean-viz@example.com"}
+]
+license = {text = "MIT"}
+
+dependencies = [
+    "xarray>=2022.3.0",
+    "dask[array]>=2022.3.0",
+    "numpy>=1.22.0",
+    "pandas>=1.4.0",
+    "matplotlib>=3.5.0",
+    "cartopy>=0.21.0",
+    "netCDF4>=1.5.0",
+    "zarr>=2.11.0",
+    "pyyaml>=6.0",
+    "imageio>=2.9.0",
+    "imageio-ffmpeg>=0.4.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=3.0.0",
+]
+extra = [
+    "cmocean>=3.0.0",
+    "cf-xarray>=0.7.0",
+    "bottleneck>=1.3.0",
+    "geopandas>=0.10.0",
+    "shapely>=1.7.0",
+]
+
+[project.scripts]
+ocean-viz = "ocean_viz.cli:main"
+
+[tool.setuptools]
+packages = ["ocean_viz"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"

@@ -1,0 +1,96 @@
+project:
+  name: blueSteel ocean reanalysis prototype
+
+dataset:
+  name: GLORYS12V1
+  adapter: glorys12
+  access:
+    type: local
+    path: /Volumes/SKRATCH/GLORY/*.nc
+    engine: netcdf4
+
+region:
+  name: north_pacific
+  lon_convention: 0_360
+  lon_min: 160
+  lon_max: 235
+  lat_min: 40
+  lat_max: 68
+
+time:
+  start: 2018-06-01
+  end: 2018-06-10
+  timestep: daily
+
+variable:
+  name: sst
+  source_var: thetao
+  display_name: Sea surface temperature
+  units: degC
+  surface_selector:
+    mode: nearest_depth
+    depth_m: 0
+
+derived:
+  enabled: false
+  variables:
+    current_speed:
+      type: current_speed
+      u_var: uo
+      v_var: vo
+    sst_gradient:
+      type: sst_gradient
+      sst_var: thetao
+    sst_anomaly:
+      type: sst_anomaly
+      sst_var: thetao
+    thermal_habitat_mask_broad:
+      type: thermal_habitat_mask
+      sst_var: thetao
+      temp_min: 5.0
+      temp_max: 15.0
+    thermal_habitat_mask_high_use:
+      type: thermal_habitat_mask
+      sst_var: thetao
+      temp_min: 8.0
+      temp_max: 13.0
+
+visual:
+  style: diagnostic
+  projection: north_pacific_platecarree
+  show_land: true
+  show_coastline: true
+  show_bathymetry: false
+  color_scale:
+    mode: fixed
+    vmin: 4
+    vmax: 16
+    cmap: turbo
+
+habitat_bands:
+  enabled: true
+  bands:
+    - name: steelhead_broad
+      variable: sst
+      min: 5
+      max: 15
+      units: degC
+    - name: steelhead_high_use
+      variable: sst
+      min: 8
+      max: 13
+      units: degC
+
+output:
+  output_dir: outputs
+  resolution: 1080p
+  dpi: 200
+  auto_filename: true
+  snapshot:
+    enabled: true
+    date: 2018-06-01
+  movie:
+    enabled: true
+    format: mp4
+    fps: 4
+    delete_frames: true

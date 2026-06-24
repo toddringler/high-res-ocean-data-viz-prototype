@@ -1,0 +1,2 @@
+[console_scripts]
+ocean-viz = ocean_viz.cli:main

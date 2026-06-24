@@ -1,3 +1,32 @@
+Metadata-Version: 2.4
+Name: ocean-viz
+Version: 0.1.0
+Summary: High-resolution ocean reanalysis visualization for GLORYS12V1
+Author-email: Ocean Viz Team <ocean-viz@example.com>
+License: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: xarray>=2022.3.0
+Requires-Dist: dask[array]>=2022.3.0
+Requires-Dist: numpy>=1.22.0
+Requires-Dist: pandas>=1.4.0
+Requires-Dist: matplotlib>=3.5.0
+Requires-Dist: cartopy>=0.21.0
+Requires-Dist: netCDF4>=1.5.0
+Requires-Dist: zarr>=2.11.0
+Requires-Dist: pyyaml>=6.0
+Requires-Dist: imageio>=2.9.0
+Requires-Dist: imageio-ffmpeg>=0.4.5
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=3.0.0; extra == "dev"
+Provides-Extra: extra
+Requires-Dist: cmocean>=3.0.0; extra == "extra"
+Requires-Dist: cf-xarray>=0.7.0; extra == "extra"
+Requires-Dist: bottleneck>=1.3.0; extra == "extra"
+Requires-Dist: geopandas>=0.10.0; extra == "extra"
+Requires-Dist: shapely>=1.7.0; extra == "extra"
+
 # High-Resolution Ocean Data Visualization
 
 A Python prototype for visualizing high-resolution surface-ocean reanalysis data for the blueSteel ocean migration project.
